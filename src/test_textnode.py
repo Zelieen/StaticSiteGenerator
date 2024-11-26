@@ -1,6 +1,6 @@
 import unittest
 
-from textnode import TextNode, TextType, text_node_to_html_node, split_nodes_delimiter
+from textnode import TextNode, TextType, text_node_to_html_node
 
 
 class TestTextNode(unittest.TestCase):
@@ -57,32 +57,6 @@ class TestTextNode(unittest.TestCase):
         test_text = TextNode("This is a text node", TextType.ERROR, "https://www.boot.dev")
         with self.assertRaisesRegex(Exception, "Not a valid text type: TextType.ERROR"):
             (text_node_to_html_node(test_text))
-
-    def test_split(self):
-        node =  TextNode("This **ita** est", TextType.TEXT)
-        self.assertEqual(str(split_nodes_delimiter(node, "**", TextType.BOLD)), '[TextNode(This , text, None), TextNode(ita, bold, None), TextNode( est, text, None)]')
-
-    def test_split_stretch(self):
-        node =  TextNode("This **ita so far** est", TextType.TEXT)
-        self.assertEqual(str(split_nodes_delimiter(node, "**", TextType.BOLD)), '[TextNode(This , text, None), TextNode(ita so far, bold, None), TextNode( est, text, None)]')
-
-
-    def test_split_multi(self):
-        node =  TextNode("This *ita* est *rome* anic", TextType.TEXT)
-        self.assertEqual(str(split_nodes_delimiter(node, "*", TextType.ITALIC)), '[TextNode(This , text, None), TextNode(ita, italic, None), TextNode( est , text, None), TextNode(rome, italic, None), TextNode( anic, text, None)]')
-
-    def test_split_Exc(self):
-        node =  TextNode("Not **ita est", TextType.TEXT)
-        with self.assertRaisesRegex(Exception, "Invalid Markdown Syntax: No closing delimiter for TextType.BOLD found."):
-            (split_nodes_delimiter(node, "**", TextType.BOLD))
-
-    def test_split_end(self):
-        node =  TextNode("This *ita* est `code`", TextType.TEXT)
-        self.assertEqual(str(split_nodes_delimiter(node, "`", TextType.CODE)), '[TextNode(This *ita* est , text, None), TextNode(code, code, None)]')
-
-    def test_split_begin(self):
-        node =  TextNode("**This** is Sparta", TextType.TEXT)
-        self.assertEqual(str(split_nodes_delimiter(node, "**", TextType.BOLD)), '[TextNode(This, bold, None), TextNode( is Sparta, text, None)]')
 
 if __name__ == "__main__":
     unittest.main()

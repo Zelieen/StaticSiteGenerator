@@ -42,28 +42,5 @@ def text_node_to_html_node(text_node):
         case _:
             raise Exception(f"Not a valid text type: {text_node.text_type}")
         
-def split_nodes_delimiter(old_nodes, delimiter, text_type):
-    if isinstance(old_nodes, TextNode):
-        nodes = [old_nodes]
-    else:
-        nodes = old_nodes
-    new_nodes = []
-    for node in nodes:
-        if node.text_type == TextType.TEXT: #check for delimiter
-            blocks = node.text.split(delimiter)
-            if len(blocks) == 1: #the delimiter was not found in node
-                new_nodes.append(node)
-            elif not len(blocks) % 2: #no matching delimiter pair
-                raise Exception(f"Invalid Markdown Syntax: No closing delimiter for {text_type} found.")
-            else: #valid delimiters
-                start_block = blocks[0]
-                end_blocks = delimiter.join(blocks[2:])
-                if start_block != "":
-                    new_nodes.append(TextNode(start_block, TextType.TEXT))
-                new_nodes.append(TextNode(blocks[1], text_type))
-                if end_blocks != "":
-                    new_nodes.extend(split_nodes_delimiter(TextNode(end_blocks, TextType.TEXT), delimiter, text_type))
-        else:
-            new_nodes.append(node)
-    return new_nodes
+
 

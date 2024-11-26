@@ -1,6 +1,6 @@
 import unittest
 
-from extracter import extract_markdown_images, extract_markdown_links, split_nodes_delimiter, split_nodes_image, split_nodes_link
+from extracter import extract_markdown_images, extract_markdown_links, split_nodes_delimiter, split_nodes_image, split_nodes_link, text_to_textnodes
 from textnode import TextNode, TextType
 
 class TestTextNode(unittest.TestCase):
@@ -85,6 +85,38 @@ class TestTextNode(unittest.TestCase):
     def test_link_split_confuse(self):
         node =  TextNode("Start ![obi wan](https://i.imgur.com/fJRm4Vk.jpeg) middle [obi wan](https://i.imgur.com/fJRm4Vk.jpeg) end", TextType.TEXT)
         self.assertEqual(str(split_nodes_link(node)), '[TextNode(Start ![obi wan](https://i.imgur.com/fJRm4Vk.jpeg) middle , text, None), TextNode(obi wan, link, https://i.imgur.com/fJRm4Vk.jpeg), TextNode( end, text, None)]')
+
+    def test_split_to_nodes(self):
+        text = "First test"
+        self.assertEqual(str(text_to_textnodes(text)), '[TextNode(First test, text, None)]')
+
+    def test_split_to_nodes_bold(self):
+        text = "Text in **bold**"
+        self.assertEqual(str(text_to_textnodes(text)), '[TextNode(Text in , text, None), TextNode(bold, bold, None)]')
+
+    def test_split_to_nodes_bold_ital(self):
+        text = "Text in **bold**, *italic*"
+        self.assertEqual(str(text_to_textnodes(text)), '[TextNode(Text in , text, None), TextNode(bold, bold, None), TextNode(, , text, None), TextNode(italic, italic, None)]')
+
+    def test_split_to_nodes_bold_ital_code(self):
+        text = "Text in **bold**, *italic* and `code` style with an "
+        self.assertEqual(str(text_to_textnodes(text)), '[TextNode(Text in , text, None), TextNode(bold, bold, None), TextNode(, , text, None), TextNode(italic, italic, None), TextNode( and , text, None), TextNode(code, code, None), TextNode( style with an , text, None)]')
+
+    def test_split_to_nodes_bold_ital_code_image(self):
+        text = "Text in **bold**, *italic* and `code` style with an ![obi wan image](https://i.imgur.com/fJRm4Vk.jpeg)"
+        self.assertEqual(str(text_to_textnodes(text)), '[TextNode(Text in , text, None), TextNode(bold, bold, None), TextNode(, , text, None), TextNode(italic, italic, None), TextNode( and , text, None), TextNode(code, code, None), TextNode( style with an , text, None), TextNode(obi wan image, image, https://i.imgur.com/fJRm4Vk.jpeg)]')
+
+    def test_split_to_nodes_bold_ital_code_image_txt(self):
+        text = "Text in **bold**, *italic* and `code` style with an ![obi wan image](https://i.imgur.com/fJRm4Vk.jpeg) and a "
+        self.assertEqual(str(text_to_textnodes(text)), '[TextNode(Text in , text, None), TextNode(bold, bold, None), TextNode(, , text, None), TextNode(italic, italic, None), TextNode( and , text, None), TextNode(code, code, None), TextNode( style with an , text, None), TextNode(obi wan image, image, https://i.imgur.com/fJRm4Vk.jpeg), TextNode( and a , text, None)]')
+
+    def test_split_to_nodes_link(self):
+        text = "Text with a [link](https://boot.dev)"
+        self.assertEqual(str(text_to_textnodes(text)), '[TextNode(Text with a , text, None), TextNode(link, link, https://boot.dev)]')
+                         
+    def test_split_to_nodes_all_types(self):
+        text = "Text in **bold**, *italic* and `code` style with an ![obi wan image](https://i.imgur.com/fJRm4Vk.jpeg) and a [link](https://boot.dev)"
+        self.assertEqual(str(text_to_textnodes(text)), '[TextNode(Text in , text, None), TextNode(bold, bold, None), TextNode(, , text, None), TextNode(italic, italic, None), TextNode( and , text, None), TextNode(code, code, None), TextNode( style with an , text, None), TextNode(obi wan image, image, https://i.imgur.com/fJRm4Vk.jpeg), TextNode( and a , text, None), TextNode(link, link, https://boot.dev)]')
 
 if __name__ == "__main__":
     unittest.main()

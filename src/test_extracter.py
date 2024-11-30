@@ -1,6 +1,6 @@
 import unittest
 
-from extracter import extract_markdown_images, extract_markdown_links, split_nodes_delimiter, split_nodes_image, split_nodes_link, text_to_textnodes
+from extracter import extract_markdown_images, extract_markdown_links, split_nodes_delimiter, split_nodes_image, split_nodes_link, text_to_textnodes, markdown_to_blocks, block_to_block_type
 from textnode import TextNode, TextType
 
 class TestTextNode(unittest.TestCase):
@@ -117,6 +117,78 @@ class TestTextNode(unittest.TestCase):
     def test_split_to_nodes_all_types(self):
         text = "Text in **bold**, *italic* and `code` style with an ![obi wan image](https://i.imgur.com/fJRm4Vk.jpeg) and a [link](https://boot.dev)"
         self.assertEqual(str(text_to_textnodes(text)), '[TextNode(Text in , text, None), TextNode(bold, bold, None), TextNode(, , text, None), TextNode(italic, italic, None), TextNode( and , text, None), TextNode(code, code, None), TextNode( style with an , text, None), TextNode(obi wan image, image, https://i.imgur.com/fJRm4Vk.jpeg), TextNode( and a , text, None), TextNode(link, link, https://boot.dev)]')
+
+    def test_split_to_blocks(self):
+        markdown = None
+        self.assertEqual(markdown_to_blocks(markdown), ["None"])
+
+    def test_split_to_blocks_simple(self):
+        markdown = "Simple"
+        self.assertEqual(markdown_to_blocks(markdown), ["Simple"])
+
+    def test_split_to_blocks_trim(self):
+        markdown = " This is text  "
+        self.assertEqual(markdown_to_blocks(markdown), ["This is text"])
+
+    def test_split_to_blocks_full(self):
+        markdown = "# This is a heading\n\nThis is a paragraph of text. It has some **bold** and *italic* words inside of it.\n\n* This is the first list item in a list block\n* This is a list item\n* This is another list item"
+        self.assertEqual(markdown_to_blocks(markdown), ["# This is a heading", "This is a paragraph of text. It has some **bold** and *italic* words inside of it.", "* This is the first list item in a list block\n* This is a list item\n* This is another list item"])
+
+    def test_blocker_heading(self):
+        block = "# Test head"
+        self.assertEqual(block_to_block_type(block), "heading")
+
+    def test_blocker_sub_heading(self):
+        block = "### Test subhead"
+        self.assertEqual(block_to_block_type(block), "heading")
+
+    def test_blocker_not_heading(self):
+        block = "####### too many"
+        self.assertEqual(block_to_block_type(block), "normal")
+
+    def test_blocker_code(self):
+        block = "```code block```"
+        self.assertEqual(block_to_block_type(block), "code")
+
+    def test_blocker_quote(self):
+        block = ">quotation"
+        self.assertEqual(block_to_block_type(block), "quote")
+
+    def test_blocker_quote_2(self):
+        block = ">quotation\n>quote2"
+        self.assertEqual(block_to_block_type(block), "quote")
+
+    def test_blocker_quote_faulty(self):
+        block = ">quotation\nfaultyquote2"
+        self.assertEqual(block_to_block_type(block), "normal")
+
+    def test_blocker_unord(self):
+        block = "* list"
+        self.assertEqual(block_to_block_type(block), "unordered")
+
+    def test_blocker_unord_alt(self):
+        block = "- list"
+        self.assertEqual(block_to_block_type(block), "unordered")
+        
+    def test_blocker_unord_2(self):
+        block = "* list\n- two"
+        self.assertEqual(block_to_block_type(block), "unordered")
+        
+    def test_blocker_unord_faulty(self):
+        block = "* list\nfaulty"
+        self.assertEqual(block_to_block_type(block), "normal")
+
+    def test_blocker_ord(self):
+        block = "1. count"
+        self.assertEqual(block_to_block_type(block), "ordered")
+
+    def test_blocker_ord_2(self):
+        block = "1. count\n2. on"
+        self.assertEqual(block_to_block_type(block), "ordered")
+
+    def test_blocker_ord_faulty(self):
+        block = "1. count\n0. faulty"
+        self.assertEqual(block_to_block_type(block), "normal")
 
 if __name__ == "__main__":
     unittest.main()

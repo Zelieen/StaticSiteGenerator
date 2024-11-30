@@ -94,3 +94,39 @@ def text_to_textnodes(text):
     nodes = split_nodes_image(nodes)
     nodes = split_nodes_link(nodes)
     return nodes
+
+def markdown_to_blocks(markdown):
+    pre_blocks = str(markdown).split("\n\n")
+    blocks = []
+    for block in pre_blocks:
+        if block != "":
+            blocks.append(block.strip())
+    return blocks
+
+def block_to_block_type(block):
+    if re.match(r"(#{1,6} .)", block) != None: #are there 1 to 6 '#' followed by whitespace and then any character at the beginning?
+        return "heading"
+    elif block[:3] == "```" and block[-3:]  == "```":
+        return "code"
+    else:
+        lines = block.split("\n")
+        if lines[0][0] == ">":
+            all_true = True
+            for line in lines:
+                all_true = all_true and line[0] == ">"
+            if all_true:
+                return "quote"
+        elif lines[0][:2] == "* " or lines[0][:2] == "- ":
+            all_true = True
+            for line in lines:
+                all_true = all_true and re.match(r"\*|\- ", line) != None
+            if all_true:
+                return "unordered"
+        elif re.match(r"1\. ", lines[0]) != None:
+            all_true = True
+            for i in range(len(lines)):
+                k = str(i + 1)
+                all_true = all_true and re.match(k + r"\. ", lines[i]) != None
+            if all_true:
+                return "ordered"
+    return "normal"

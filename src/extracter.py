@@ -130,3 +130,12 @@ def block_to_block_type(block):
             if all_true:
                 return "ordered"
     return "normal"
+
+def extract_title(markdown):
+    lines = markdown.split("\n")
+    title = None
+    for line in lines:
+        if re.match(r"# .", line) != None:
+            title = line[2:].strip()
+            return title
+    raise Exception("no title in md found")

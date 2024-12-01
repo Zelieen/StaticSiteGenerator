@@ -1,9 +1,12 @@
 import os
 import shutil
+from converter import markdown_to_html_node
+from extracter import extract_title
 
 def main():
     print("Hello, I am starting")
     copy_static_to_public(".")
+    generate_page("./content/index.md", "./template.html", "./public/index.html")
 
 def copy_static_to_public(path):
     static_path = path + "/static"
@@ -44,6 +47,30 @@ def make_dirs_and_files(file_list):
         else:
             shutil.copy(path_list[i], dest_list[i])
             print(f"created a file: {dest_list[i]}")
+    return
+
+def generate_page(from_path, template_path, dest_path):
+    print(f"Generating page from {from_path} to {dest_path} using {template_path}")
+    
+    f = open(from_path, "r")
+    markdown_in = f.read()
+    f.close()
+    
+    t = open(template_path, "r")
+    template = t.read()
+    t.close()
+    
+    content = markdown_to_html_node(markdown_in).to_html()
+    title = extract_title(markdown_in)
+
+    new = template.replace("{{ Title }}", title).replace("{{ Content }}", content)
+
+    n = open(dest_path, "w")
+    n.write(new)
+    n.close()
+
+    print("Done generating")
+
     return
 
 main()

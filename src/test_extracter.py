@@ -1,6 +1,6 @@
 import unittest
 
-from extracter import extract_markdown_images, extract_markdown_links, split_nodes_delimiter, split_nodes_image, split_nodes_link, text_to_textnodes, markdown_to_blocks, block_to_block_type
+from extracter import extract_markdown_images, extract_markdown_links, split_nodes_delimiter, split_nodes_image, split_nodes_link, text_to_textnodes, markdown_to_blocks, block_to_block_type, extract_title
 from textnode import TextNode, TextType
 
 class TestTextNode(unittest.TestCase):
@@ -189,6 +189,14 @@ class TestTextNode(unittest.TestCase):
     def test_blocker_ord_faulty(self):
         block = "1. count\n0. faulty"
         self.assertEqual(block_to_block_type(block), "normal")
+
+    def test_title_extr(self):
+        markdown = "# Proper Title  "
+        self.assertEqual(extract_title(markdown), "Proper Title")
+
+    def test_title_extr_long(self):
+        markdown = "other stuff \n#  Proper Title  \n## subtitle"
+        self.assertEqual(extract_title(markdown), "Proper Title")
 
 if __name__ == "__main__":
     unittest.main()

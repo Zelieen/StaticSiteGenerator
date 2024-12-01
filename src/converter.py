@@ -11,27 +11,20 @@ def markdown_to_html_node(markdown):
         block_node = create_node_by_type(block)
         #print(block_node)
         block_nodes.append(block_node)
-
-    #next step: 
     return ParentNode("body", block_nodes)
 
 def create_node_by_type(block):
     textlist, tag = strip_by_md_tags(block)
     if len(textlist) == 1 and tag != "pre":
         parentnodelist = text_to_children(textlist[0])
-    else:
-        #textnodelist = []
+    else: #add a prefix tag before nested tag
         parentnodelist = []
         nested_tag = "li"
         if tag == "pre":
             nested_tag = "code"
         for text in textlist:
-            #textnodelist.append(text_to_children(text))
             parentnodelist.append(ParentNode(tag=nested_tag, children=text_to_children(text)))
-        #?? for node in textnodelist:
-        #   parentnodelist.append(ParentNode(tag=nested_tag, children=text_to_children(text)))
-        #parentnodelist = ParentNode(tag=nested_tag, children=textnodelist)
-    print(f"\nthis is the  parentnodelist: {parentnodelist}\n")
+    #print(f"\nthis is the  parentnodelist: {parentnodelist}\n")
     return ParentNode(tag=tag, children=parentnodelist)
 
 def text_to_children(blocktext):

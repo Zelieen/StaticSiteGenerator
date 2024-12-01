@@ -73,6 +73,16 @@ class TestTextNode(unittest.TestCase):
                 ]
                 )))
 
+    def test_markdown_conversion_link(self):
+        markdown = "**Bold text**[Click me!](https://www.google.com)"
+        self.assertEqual(str(markdown_to_html_node(markdown)), str(ParentNode("body", [
+            ParentNode(tag="p", children=[
+                LeafNode("b", "Bold text", None),
+                LeafNode("a", "Click me!", {"href": "https://www.google.com"})]
+                ) 
+                ]
+                ))
+                )
 
 if __name__ == "__main__":
     unittest.main()

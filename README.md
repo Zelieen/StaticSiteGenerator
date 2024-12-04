@@ -18,7 +18,7 @@ Specifically not supported:
 
 To use it:
 * clone the project `https://github.com/Zelieen/StaticSiteGenerator.git`
-* run ./main.sh from the root of the project
+* run `./main.sh` from the root of the project
 * open a browser on http://localhost:8888 to see the generated content.
 
 Customize by changing the markdown files (and directories) inside the content directory

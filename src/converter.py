@@ -46,8 +46,7 @@ def strip_by_md_tags(block): #separates markdown syntax from text, returns bona 
             paragraph = []
             lines = block.split("\n")
             for line in lines:
-                print(line[1:].strip())
-                paragraph.append(line[1:].strip()) #remove leading "<"
+                paragraph.append(line[1:].strip()) #remove leading "<" and any whitespace
             blocktext = [" ".join(paragraph)]
             tag = "blockquote"
         case "unordered":

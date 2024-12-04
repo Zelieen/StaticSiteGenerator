@@ -6,7 +6,7 @@ from extracter import extract_title
 def main():
     print("Hello, I am starting")
     copy_static_to_public(".")
-    generate_page("./content/index.md", "./template.html", "./public/index.html")
+    generate_pages_recursive("./content", "./template.html", "./public")
 
 def copy_static_to_public(path):
     static_path = path + "/static"
@@ -31,15 +31,15 @@ def get_all_in_path(path):
     else:
         return [path] # a file here
     
-def replace_static_with_public_path(path_list):
-    replaced_paths = []
+def replace_paths_part(path_list, replace, new):
+    new_list = []
     for path in path_list:
-        replaced_paths.append(path[:1] + "/public" + path[8:])
-    return replaced_paths
+        new_list.append(path.replace(replace, new))
+    return new_list
 
 def make_dirs_and_files(file_list):
     path_list = sorted(file_list) # make sure directories are handled before enclosed files.
-    dest_list = replace_static_with_public_path(path_list)
+    dest_list = replace_paths_part(path_list, "static", "public")
     for i in range(len(path_list)):
         if os.path.isdir(path_list[i]):
             os.mkdir(dest_list[i])
@@ -71,6 +71,17 @@ def generate_page(from_path, template_path, dest_path):
 
     print("Done generating")
 
+    return
+
+def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
+    dir_list = get_all_in_path(dir_path_content)
+    for direc in dir_list:
+        if ".md" in direc:
+            direc_destination = replace_paths_part([direc], dir_path_content, dest_dir_path)[0][:-2] + "html"
+            parent_dir = "/".join(direc_destination.split("/")[:-1])
+            if not os.path.exists(parent_dir):
+                os.makedirs(parent_dir) # handles also needed parent directories to the parent directory (unlike os.mkdir())
+            generate_page(direc, template_path, direc_destination)
     return
 
 main()

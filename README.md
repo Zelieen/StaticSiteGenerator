@@ -14,7 +14,7 @@ Supported markdown syntax:
 * ordered lists
 
 Specifically not supported:
-* nested syntax (like italic in bold)
+* nested text syntax (italic, bold or code inside one another)
 
 To use it:
 * clone the project `https://github.com/Zelieen/StaticSiteGenerator.git`
